@@ -5,4 +5,4 @@ from groomie.models import UniqueWedding, BasicWedding
 
 admin.site.register(Order)
 admin.site.register(Customer, UserAdmin)
-UserAdmin.fieldsets +=  (('Extra Fields', {'fields': ('broj_telefona', 'created', )}),)
+UserAdmin.fieldsets +=  (('Extra Fields', {'fields': ('broj_telefona', )}),)

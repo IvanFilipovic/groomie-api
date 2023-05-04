@@ -3,14 +3,25 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.views import APIView
 from groomie.models import UniqueWedding, UniqueGuest, BasicWedding, BasicGuest
 from customers.models import Customer
-from .serializers import WeddingSerializer, CountSerialize, GuestSerializerCreate, GuestSerializerDetail, UserSerializer, BasicWeddingSerializer, BasicGuestSerializerCreate
+from .serializers import WeddingSerializer, CountSerialize, GuestSerializerCreate, GuestSerializerDetail, UserSerializer, BasicWeddingSerializer, BasicGuestSerializerCreate, LoginSerializer
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Count
+
+class LoginView(APIView):
+    # This view should be accessible also for unauthenticated users.
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = LoginSerializer(data=self.request.data,
+            context={ 'request': self.request })
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        return Response(None, status=status.HTTP_202_ACCEPTED)
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 20

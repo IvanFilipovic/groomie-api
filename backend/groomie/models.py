@@ -17,7 +17,7 @@ class UniqueWedding(models.Model):
 
     def save(self, *args, **kwargs):
         while not self.wedding_slug:
-            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 2)]
+            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 4), random.sample(string.ascii_letters, 4)]
             random.shuffle(slug)
             newslug = ''.join(''.join(l) for l in slug)
             if not UniqueWedding.objects.filter(pk=newslug).exists():
@@ -62,7 +62,7 @@ class UniqueGuest(models.Model):
 
     def save(self, *args, **kwargs):
         while not self.guest_slug:
-            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 4)]
+            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 4), random.sample(string.ascii_letters, 4)]
             random.shuffle(slug)
             newslug = ''.join(''.join(l) for l in slug)
             if not UniqueGuest.objects.filter(pk=newslug).exists():
@@ -101,7 +101,7 @@ class BasicWedding(models.Model):
 
     def save(self, *args, **kwargs):
         while not self.wedding_slug:
-            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 4)]
+            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 4), random.sample(string.ascii_letters, 4)]
             random.shuffle(slug)
             newslug = ''.join(''.join(l) for l in slug)
             if not BasicWedding.objects.filter(pk=newslug).exists():
@@ -145,7 +145,7 @@ class BasicGuest(models.Model):
 
     def save(self, *args, **kwargs):
         while not self.guest_slug:
-            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 2)]
+            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 4), random.sample(string.ascii_letters, 4)]
             random.shuffle(slug)
             newslug = ''.join(''.join(l) for l in slug)
             if not BasicGuest.objects.filter(pk=newslug).exists():
