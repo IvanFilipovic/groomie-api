@@ -120,10 +120,25 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  ),
+    #"DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
+
+# See https://firebase.google.com/docs/auth/admin/create-custom-tokens#create_custom_tokens_using_a_third-party_jwt_library
+
+#SIMPLE_JWT = {
+#    "ALGORITHM": "RS256",
+#    "SIGNING_KEY": env.str("FIREBASE_PRIVATE_KEY", multiline=True),
+#    "VERIFYING_KEY": env.str("FIREBASE_PUBLIC_KEY", multiline=True),
+#    "ISSUER": env.str("FIREBASE_SERVICE_EMAIL"),
+#    "USER_ID_CLAIM": "uid",
+#    # Firebase allows only max=1h
+#    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+#    "AUDIENCE": "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
+#}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

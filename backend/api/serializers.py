@@ -1,11 +1,24 @@
 from rest_framework import serializers
-from groomie.models import UniqueWedding, Guest, BasicWedding, BasicGuest
+from groomie.models import UniqueWedding, UniqueGuest, BasicWedding, BasicGuest
 from customers.models import Customer
+from django.db.models import Sum
 
 class UserSerializer(serializers.ModelSerializer):
+    unique_wedding = serializers.CharField(source='wedding_on_customer.wedding_slug')
+    basic_wedding = serializers.CharField(source='basicwedding.wedding_slug')
     class Meta:
         model = Customer
-        fields ='__all__'
+        fields =[
+            'pk',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'broj_telefona',
+            'unique_wedding',
+            'basic_wedding',
+        ]
+
 
 class WeddingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,7 +66,7 @@ class BasicWeddingSerializer(serializers.ModelSerializer):
 
 class GuestSerializerCreate(serializers.ModelSerializer):
     class Meta:
-        model = Guest
+        model = UniqueGuest
         fields = [
             'guest_slug',
             'wedding_owner',
@@ -102,7 +115,7 @@ class GuestSerializerDetail(serializers.ModelSerializer):
 
 
     class Meta:
-        model = Guest
+        model = UniqueGuest
         fields = [
             'wedding_owner',
             'guest_fname',
@@ -126,3 +139,30 @@ class GuestSerializerDetail(serializers.ModelSerializer):
             'restaurant_time',
             'message',
             ]
+        
+class CountSerialize(serializers.ModelSerializer):
+    broj_pozivnica = serializers.SerializerMethodField()
+    dolaze_solo = serializers.SerializerMethodField()
+    ne_dolaze = serializers.SerializerMethodField()
+    expected_guests = serializers.IntegerField()
+    dolaze_plusone = serializers.SerializerMethodField()
+    dolaze_djeca = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UniqueWedding
+        fields = ('wedding_slug', 'expected_guests', 'broj_pozivnica', 'dolaze_solo', 'ne_dolaze', 'dolaze_plusone', 'dolaze_djeca')
+
+    def get_broj_pozivnica(self, obj):
+        return UniqueGuest.objects.filter(wedding_owner=obj).count()
+    
+    def get_dolaze_solo(self, obj):
+        return UniqueGuest.objects.filter(wedding_owner=obj, coming=True, plusone=False, with_kids=False).count()
+    
+    def get_ne_dolaze(self, obj):
+        return UniqueGuest.objects.filter(wedding_owner=obj, not_coming=True).count()
+
+    def get_dolaze_plusone(self, obj):
+        return UniqueGuest.objects.filter(wedding_owner=obj, plusone=True).count() * 2
+    
+    def get_dolaze_djeca(self, obj):
+        return UniqueGuest.objects.filter(wedding_owner=obj, with_kids=True).aggregate(Sum('kids'))

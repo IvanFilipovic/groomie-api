@@ -1,7 +1,8 @@
-import uuid
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.conf import settings
 import random, string
+from customers.models import Customer
 
 User = settings.AUTH_USER_MODEL
 # Create your models here.
@@ -24,9 +25,9 @@ class UniqueWedding(models.Model):
 
         super().save(*args, **kwargs)
 
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, null=True, related_name='wedding_on_customer')
     created = models.DateTimeField(auto_now_add=True)
-
+    expected_guests = models.SmallIntegerField(null=True, blank=True)
     groom_fname = models.CharField(max_length=16, blank=False, default='')
     groom_lname = models.CharField(max_length=16, blank=False, default='')
     bride_fname = models.CharField(max_length=16, blank=False, default='')
@@ -37,33 +38,40 @@ class UniqueWedding(models.Model):
 
     groom_gathering = models.CharField(max_length=64, blank=True, default='')
     groom_gathering_time = models.TimeField(blank=True)
+    groom_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    groom_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
     bride_gathering = models.CharField(max_length=64, blank=True, default='')
     bride_gathering_time = models.TimeField(blank=True)
-
+    bride_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    bride_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
     church_name = models.CharField(max_length=48, blank=False, default='')
     church_time = models.TimeField(blank=False)
+    church_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    church_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
     restaurant_name = models.CharField(max_length=48, blank=False, default='')
     restaurant_time = models.TimeField(blank=False)
+    restaurant_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    restaurant_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
 
     def __str__(self):
         return f'{self.groom_fname} & {self.bride_fname} {self.groom_lname}'
 
 
-class Guest(models.Model):
+class UniqueGuest(models.Model):
     guest_slug = models.SlugField(primary_key=True, unique=True, editable=False, blank=True)
 
     def save(self, *args, **kwargs):
         while not self.guest_slug:
-            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 2)]
+            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 4)]
             random.shuffle(slug)
             newslug = ''.join(''.join(l) for l in slug)
-            if not Guest.objects.filter(pk=newslug).exists():
+            if not UniqueGuest.objects.filter(pk=newslug).exists():
                 self.guest_slug = newslug
 
         super().save(*args, **kwargs)
 
-    wedding_owner = models.OneToOneField(UniqueWedding, on_delete=models.CASCADE, null=True, related_name='wedding')
-
+    wedding_owner = models.ForeignKey(UniqueWedding, on_delete=models.CASCADE, null=True, related_name='uniquewedding')
+    email = models.EmailField(unique=True, blank=True, default='')
     guest_fname = models.CharField(max_length=16, blank=False, default='')
     guest_lname = models.CharField(max_length=16, blank=False, default='')
 
@@ -75,9 +83,11 @@ class Guest(models.Model):
                 choices=GUEST_TYPE,
                 default='')
 
+    with_kids = models.BooleanField(default=False)
     couple = models.BooleanField(default=False)
     plusone = models.BooleanField(default=False)
     coming = models.BooleanField(default=False)
+    not_coming =models.BooleanField(default=False)
     kids = models.SmallIntegerField(null=True, blank=True)
 
     message = models.CharField(max_length=256, blank=True, default='')
@@ -91,7 +101,7 @@ class BasicWedding(models.Model):
 
     def save(self, *args, **kwargs):
         while not self.wedding_slug:
-            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 2)]
+            slug = [random.sample(string.ascii_letters, 4),random.sample(string.digits, 3), random.sample(string.ascii_letters, 4)]
             random.shuffle(slug)
             newslug = ''.join(''.join(l) for l in slug)
             if not BasicWedding.objects.filter(pk=newslug).exists():
@@ -99,9 +109,9 @@ class BasicWedding(models.Model):
 
         super().save(*args, **kwargs)
 
-    customer = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='basicwedding')
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, null=True, related_name='basicwedding')
     created = models.DateTimeField(auto_now_add=True)
-
+    expected_guests = models.SmallIntegerField(null=True, blank=True)
     groom_fname = models.CharField(max_length=16, blank=False, default='')
     groom_lname = models.CharField(max_length=16, blank=False, default='')
     bride_fname = models.CharField(max_length=16, blank=False, default='')
@@ -112,13 +122,20 @@ class BasicWedding(models.Model):
 
     groom_gathering = models.CharField(max_length=64, blank=True, default='')
     groom_gathering_time = models.TimeField(blank=True)
+    groom_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    groom_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
     bride_gathering = models.CharField(max_length=64, blank=True, default='')
     bride_gathering_time = models.TimeField(blank=True)
-
+    bride_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    bride_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
     church_name = models.CharField(max_length=48, blank=False, default='')
     church_time = models.TimeField(blank=False)
+    church_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    church_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
     restaurant_name = models.CharField(max_length=48, blank=False, default='')
     restaurant_time = models.TimeField(blank=False)
+    restaurant_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
+    restaurant_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
 
     def __str__(self):
         return f'{self.groom_fname} & {self.bride_fname} {self.groom_lname}'
@@ -136,8 +153,8 @@ class BasicGuest(models.Model):
 
         super().save(*args, **kwargs)
 
-    wedding_owner = models.ForeignKey(BasicWedding, on_delete=models.CASCADE, null=True, related_name='wedding')
-
+    wedding_owner = models.ForeignKey(BasicWedding, on_delete=models.CASCADE, null=True, related_name='basicwedding')
+    email = models.EmailField(unique=True, blank=True, default='')
     guest_fname = models.CharField(max_length=16, blank=False, default='')
     guest_lname = models.CharField(max_length=16, blank=False, default='')
 
@@ -147,6 +164,7 @@ class BasicGuest(models.Model):
     with_kids = models.BooleanField(default=False)
     plusone = models.BooleanField(default=False)
     coming = models.BooleanField(default=False)
+    not_coming =models.BooleanField(default=False)
     kids = models.SmallIntegerField(null=True, blank=True)
 
     message = models.CharField(max_length=256, blank=True, default='')
