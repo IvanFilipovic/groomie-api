@@ -3,30 +3,30 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.views import APIView
 from groomie.models import UniqueWedding, UniqueGuest, BasicWedding, BasicGuest
 from customers.models import Customer
-from .serializers import WeddingSerializer, CountSerialize, GuestSerializerCreate, GuestSerializerDetail, UserSerializer, BasicWeddingSerializer, BasicGuestSerializerCreate, LoginSerializer
+from .serializers import RegisterSerializer, WeddingSerializer, CountSerialize, GuestSerializerCreate, GuestSerializerDetail, UserSerializer, BasicWeddingSerializer, BasicGuestSerializerCreate
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Count
 
-class LoginView(APIView):
-    # This view should be accessible also for unauthenticated users.
-    permission_classes = (permissions.AllowAny,)
-
-    def post(self, request, format=None):
-        serializer = LoginSerializer(data=self.request.data,
-            context={ 'request': self.request })
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        return Response(None, status=status.HTTP_202_ACCEPTED)
+class RegisterUserAPIView(generics.CreateAPIView):
+  permission_classes = (AllowAny,)
+  serializer_class = RegisterSerializer
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 20
+
+    def get_paginated_response(self, data):
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'count': self.page.paginator.count,
+            'total_pages': self.page.paginator.num_pages,
+            'results': data
+        })
 
 class UniqueWeddingGuestCount(RetrieveModelMixin,GenericViewSet):
     serializer_class = CountSerialize

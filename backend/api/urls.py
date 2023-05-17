@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from api import views
+from .views import RegisterUserAPIView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -12,7 +13,7 @@ urlpatterns = [
     path('basic-wedding/<wedding_slug>/guests/', views.BasicGuestList.as_view(), name='guests-list'), #Dashboard - lista gostiju
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('login/', views.LoginView.as_view()),
+    path('register', RegisterUserAPIView.as_view(), name="register"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
@@ -20,7 +21,6 @@ urlpatterns = format_suffix_patterns(urlpatterns)
 router = DefaultRouter()
 router.register(r'uniqueguest-count', views.UniqueWeddingGuestCount, basename='guest-count') #Count endpont, koliko gostiju dolazi/pozvano
 router.register(r'user', views.ProfileViewSet, basename='customer') #Dashboard vjenčanje user me endpoint
-router.register(r'register', views.UserViewSet, basename='customer-register') # #Dashboard vjenčanje, PUT na usera
 router.register(r'unique-wedding', views.WeddingViewSet, basename='wedding') #Kreiranje unique vjenčanja 
 router.register(r'unique-wedding/<slug:wedding_slug>', views.WeddingViewSet, basename='wedding_detail')# Edit/Get vjenčanja
 router.register(r'unique-guests', views.GuestForUserViewSet, basename='guests')#Post gositju
