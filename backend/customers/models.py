@@ -16,7 +16,7 @@ class Customer(AbstractUser):
     
 class Order(models.Model):
     order_id = models.CharField(max_length=100, default="")
-    cutomer_name = models.ForeignKey(Customer,  related_name='customer_name', on_delete=models.CASCADE)
+    cutomer_name = models.ForeignKey(Customer, related_name='customer_name', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, blank=True)
     address = models.CharField(max_length= 50)
     city = models.CharField(max_length= 20)
@@ -28,15 +28,20 @@ class Order(models.Model):
     order_state_list = [
         ('pending', 'Pending'),
         ('cancelled', 'Cancelled'),
-        ('confirm', 'Confirm'),   
-        ('delivered', 'Delivered'),    
+        ('confirm', 'Confirm'),  
         ]
-    order_status = models.CharField(max_length=50, choices=order_state_list, default="pending")
+    order_status = models.CharField(max_length=20, choices=order_state_list, default="pending")
+
+    event_type_list = [
+        ('basic', 'Basic'),
+        ('nique', 'Unique'), 
+        ]
+    event_type = models.CharField(max_length=20, choices=event_type_list, default="pending")
 
     payment_state_list = [
         ('pending', 'Pending'),
         ('cancelled', 'Cancelled'),
         ('confirm', 'Confirm') 
         ]
-    payment_status = models.CharField(max_length=50, choices=payment_state_list, default="pending")
+    payment_status = models.CharField(max_length=20, choices=payment_state_list, default="pending")
     transaction_id = models.CharField(max_length=100)

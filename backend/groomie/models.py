@@ -31,7 +31,7 @@ class UniqueWedding(models.Model):
     groom_fname = models.CharField(max_length=16, blank=False, default='')
     groom_lname = models.CharField(max_length=16, blank=False, default='')
     bride_fname = models.CharField(max_length=16, blank=False, default='')
-    bried_lname = models.CharField(max_length=16, blank=False, default='')
+    bride_lname = models.CharField(max_length=16, blank=False, default='')
 
     wedding_date = models.DateField(blank=False)
     response_date = models.DateField(blank=False)
@@ -52,6 +52,7 @@ class UniqueWedding(models.Model):
     restaurant_time = models.TimeField(blank=False)
     restaurant_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
     restaurant_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
+    card_theme = models.CharField(max_length=28, blank=True, default='')
 
     def __str__(self):
         return f'{self.groom_fname} & {self.bride_fname} {self.groom_lname}'
@@ -84,6 +85,7 @@ class UniqueGuest(models.Model):
                 default='')
 
     with_kids = models.BooleanField(default=False)
+    solo = models.BooleanField(default=False)
     couple = models.BooleanField(default=False)
     plusone = models.BooleanField(default=False)
     coming = models.BooleanField(default=False)
@@ -115,7 +117,7 @@ class BasicWedding(models.Model):
     groom_fname = models.CharField(max_length=16, blank=False, default='')
     groom_lname = models.CharField(max_length=16, blank=False, default='')
     bride_fname = models.CharField(max_length=16, blank=False, default='')
-    bried_lname = models.CharField(max_length=16, blank=False, default='')
+    bride_lname = models.CharField(max_length=16, blank=False, default='')
 
     wedding_date = models.DateField(blank=False)
     response_date = models.DateField(blank=False)
@@ -136,6 +138,7 @@ class BasicWedding(models.Model):
     restaurant_time = models.TimeField(blank=False)
     restaurant_latitude = models.FloatField(blank=True, max_length=90, default='0.1')
     restaurant_longitude = models.FloatField(blank=True, max_length=180, default='0.1')
+    card_theme = models.CharField(max_length=28, blank=True, default='')
 
     def __str__(self):
         return f'{self.groom_fname} & {self.bride_fname} {self.groom_lname}'
@@ -162,6 +165,7 @@ class BasicGuest(models.Model):
     plusone_lname = models.CharField(max_length=16, blank=True, default='')
 
     with_kids = models.BooleanField(default=False)
+    solo = models.BooleanField(default=False)
     plusone = models.BooleanField(default=False)
     coming = models.BooleanField(default=False)
     not_coming =models.BooleanField(default=False)

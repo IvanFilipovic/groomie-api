@@ -3,12 +3,13 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.views import APIView
 from groomie.models import UniqueWedding, UniqueGuest, BasicWedding, BasicGuest
 from customers.models import Customer
-from .serializers import RegisterSerializer, WeddingSerializer, CountSerialize, GuestSerializerCreate, GuestSerializerDetail, UserSerializer, BasicWeddingSerializer, BasicGuestSerializerCreate
+from .serializers import BasicCountSerialize, RegisterSerializer, WeddingSerializer, CountSerialize, GuestSerializerCreate, GuestSerializerDetail, UserSerializer, BasicWeddingSerializer, BasicGuestSerializerCreate
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.auth import get_user_model
 
 class RegisterUserAPIView(generics.CreateAPIView):
   permission_classes = (AllowAny,)
@@ -33,6 +34,12 @@ class UniqueWeddingGuestCount(RetrieveModelMixin,GenericViewSet):
     #permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return UniqueWedding.objects.all()
+    
+class BasicWeddingGuestCount(RetrieveModelMixin,GenericViewSet):
+    serializer_class = BasicCountSerialize
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return BasicWedding.objects.all()
     
 class GuestList(generics.ListAPIView): # GET guest list for wedding - Dashboard
     queryset = UniqueGuest.objects.all()
@@ -75,6 +82,26 @@ class BasicGuestForUserViewSet(CreateModelMixin,UpdateModelMixin,RetrieveModelMi
         serializer_class = BasicGuestSerializerCreate
         def get_queryset(self):
             return BasicGuest.objects.all()
+        
+        def create(self, request, *args, **kwargs):
+            guest_type = request.data.get('guest_type')
+            if guest_type == 'PAR':
+                request.data['plusone'] = True
+            elif guest_type == 'OBITELJ':
+                request.data['with_kids'] = True
+            elif guest_type == 'SOLO':
+                request.data['solo'] = True
+            return super().create(request, *args, **kwargs)
+
+        def update(self, request, *args, **kwargs):
+            guest_type = request.data.get('guest_type')
+            if guest_type == 'PAR':
+                request.data['plusone'] = True
+            elif guest_type == 'OBITELJ':
+                request.data['with_kids'] = True
+            elif guest_type == 'SOLO':
+                request.data['solo'] = True
+            return super().update(request, *args, **kwargs)
 
 class GuestViewSet(RetrieveModelMixin,UpdateModelMixin,GenericViewSet):
     serializer_class = GuestSerializerDetail
@@ -97,3 +124,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def me(self, request, *args, **kwargs):
         self.kwargs.update(pk=request.user.id)
         return self.retrieve(request,*args, **kwargs)
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        customer = get_user_model()
+        serialized_user = UserSerializer(user).data
+        return Response(serialized_user)

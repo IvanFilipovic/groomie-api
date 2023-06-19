@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from groomie.models import UniqueWedding, UniqueGuest, BasicWedding, BasicGuest
-from customers.models import Customer
+from customers.models import Customer, Order
 from django.db.models import Sum
 from django.contrib.auth import authenticate
 
@@ -33,9 +33,20 @@ class RegisterSerializer(serializers.ModelSerializer):
     user.save()
     return user
 
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            'order_id',
+            'order_status',
+            'event_type',
+            
+        ]
 class UserSerializer(serializers.ModelSerializer):
     unique_wedding = serializers.CharField(source='wedding_on_customer.wedding_slug')
     basic_wedding = serializers.CharField(source='basicwedding.wedding_slug')
+    orders = OrderSerializer(many=True, read_only=True, source='customer_name')
+
     class Meta:
         model = Customer
         fields =[
@@ -47,6 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
             'broj_telefona',
             'unique_wedding',
             'basic_wedding',
+            'orders',
         ]
 
 
@@ -55,11 +67,12 @@ class WeddingSerializer(serializers.ModelSerializer):
         model = UniqueWedding
         fields = [
             'customer',
+            'expected_guests',
             'wedding_slug',
             'groom_fname',
             'groom_lname',
             'bride_fname',
-            'bried_lname',
+            'bride_lname',
             'wedding_date',
             'response_date',
             'church_name',
@@ -77,11 +90,12 @@ class BasicWeddingSerializer(serializers.ModelSerializer):
         model = BasicWedding
         fields = [
             'customer',
+            'expected_guests',
             'wedding_slug',
             'groom_fname',
             'groom_lname',
             'bride_fname',
-            'bried_lname',
+            'bride_lname',
             'wedding_date',
             'response_date',
             'church_name',
@@ -196,3 +210,30 @@ class CountSerialize(serializers.ModelSerializer):
     
     def get_dolaze_djeca(self, obj):
         return UniqueGuest.objects.filter(wedding_owner=obj, with_kids=True).aggregate(Sum('kids'))
+    
+class BasicCountSerialize(serializers.ModelSerializer):
+    broj_pozivnica = serializers.SerializerMethodField()
+    dolaze_solo = serializers.SerializerMethodField()
+    ne_dolaze = serializers.SerializerMethodField()
+    expected_guests = serializers.IntegerField()
+    dolaze_plusone = serializers.SerializerMethodField()
+    dolaze_djeca = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BasicWedding
+        fields = ('wedding_slug', 'expected_guests', 'broj_pozivnica', 'dolaze_solo', 'ne_dolaze', 'dolaze_plusone', 'dolaze_djeca')
+
+    def get_broj_pozivnica(self, obj):
+        return BasicGuest.objects.filter(wedding_owner=obj).count()
+
+    def get_dolaze_solo(self, obj):
+        return BasicGuest.objects.filter(wedding_owner=obj, coming=True, plusone=False, with_kids=False).count()
+
+    def get_ne_dolaze(self, obj):
+        return BasicGuest.objects.filter(wedding_owner=obj, not_coming=True).count()
+
+    def get_dolaze_plusone(self, obj):
+        return BasicGuest.objects.filter(wedding_owner=obj, plusone=True).count() * 2
+
+    def get_dolaze_djeca(self, obj):
+        return BasicGuest.objects.filter(wedding_owner=obj, with_kids=True).aggregate(Sum('kids'))
