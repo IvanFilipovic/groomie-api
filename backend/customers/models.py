@@ -45,3 +45,6 @@ class Order(models.Model):
         ]
     payment_status = models.CharField(max_length=20, choices=payment_state_list, default="pending")
     transaction_id = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.transaction_id

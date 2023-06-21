@@ -77,6 +77,38 @@ class GuestForUserViewSet(CreateModelMixin,UpdateModelMixin,RetrieveModelMixin,G
         serializer_class = GuestSerializerCreate
         def get_queryset(self):
             return UniqueGuest.objects.all()
+        
+        def create(self, request, *args, **kwargs):
+            guest_type = request.data.get('guest_type')
+            if guest_type == 'PAR':
+                request.data._mutable = True
+                request.data['plusone'] = True
+                request.data._mutable = False
+            elif guest_type == 'OBITELJ':
+                request.data._mutable = True
+                request.data['with_kids'] = True
+                request.data._mutable = False
+            elif guest_type == 'SOLO':
+                request.data._mutable = True
+                request.data['solo'] = True
+                request.data._mutable = False
+            return super().create(request, *args, **kwargs)
+
+        def update(self, request, *args, **kwargs):
+            guest_type = request.data.get('guest_type')
+            if guest_type == 'PAR':
+                request.data._mutable = True
+                request.data['plusone'] = True
+                request.data._mutable = False
+            elif guest_type == 'OBITELJ':
+                request.data._mutable = True
+                request.data['with_kids'] = True
+                request.data._mutable = False
+            elif guest_type == 'SOLO':
+                request.data._mutable = True
+                request.data['solo'] = True
+                request.data._mutable = False
+            return super().update(request, *args, **kwargs)
 
 class BasicGuestForUserViewSet(CreateModelMixin,UpdateModelMixin,RetrieveModelMixin,GenericViewSet):
         serializer_class = BasicGuestSerializerCreate
@@ -86,21 +118,33 @@ class BasicGuestForUserViewSet(CreateModelMixin,UpdateModelMixin,RetrieveModelMi
         def create(self, request, *args, **kwargs):
             guest_type = request.data.get('guest_type')
             if guest_type == 'PAR':
+                request.data._mutable = True
                 request.data['plusone'] = True
+                request.data._mutable = False
             elif guest_type == 'OBITELJ':
+                request.data._mutable = True
                 request.data['with_kids'] = True
+                request.data._mutable = False
             elif guest_type == 'SOLO':
+                request.data._mutable = True
                 request.data['solo'] = True
+                request.data._mutable = False
             return super().create(request, *args, **kwargs)
 
         def update(self, request, *args, **kwargs):
             guest_type = request.data.get('guest_type')
             if guest_type == 'PAR':
+                request.data._mutable = True
                 request.data['plusone'] = True
+                request.data._mutable = False
             elif guest_type == 'OBITELJ':
+                request.data._mutable = True
                 request.data['with_kids'] = True
+                request.data._mutable = False
             elif guest_type == 'SOLO':
+                request.data._mutable = True
                 request.data['solo'] = True
+                request.data._mutable = False
             return super().update(request, *args, **kwargs)
 
 class GuestViewSet(RetrieveModelMixin,UpdateModelMixin,GenericViewSet):

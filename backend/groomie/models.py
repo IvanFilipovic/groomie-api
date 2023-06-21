@@ -72,7 +72,6 @@ class UniqueGuest(models.Model):
         super().save(*args, **kwargs)
 
     wedding_owner = models.ForeignKey(UniqueWedding, on_delete=models.CASCADE, null=True, related_name='uniquewedding')
-    email = models.EmailField(unique=True, blank=True, default='')
     guest_fname = models.CharField(max_length=16, blank=False, default='')
     guest_lname = models.CharField(max_length=16, blank=False, default='')
 
