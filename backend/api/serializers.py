@@ -2,8 +2,6 @@ from rest_framework import serializers
 from groomie.models import UniqueWedding, UniqueGuest, BasicWedding, BasicGuest
 from customers.models import Customer, Order
 from django.db.models import Sum
-from django.contrib.auth import authenticate
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
@@ -42,6 +40,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'event_type',
             
         ]
+
 class UserSerializer(serializers.ModelSerializer):
     unique_wedding = serializers.CharField(source='wedding_on_customer.wedding_slug')
     basic_wedding = serializers.CharField(source='basicwedding.wedding_slug')
@@ -60,7 +59,6 @@ class UserSerializer(serializers.ModelSerializer):
             'basic_wedding',
             'orders',
         ]
-
 
 class WeddingSerializer(serializers.ModelSerializer):
     class Meta:
